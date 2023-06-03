@@ -1,0 +1,122 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20230530-1
+      author: Dryannikh Yuliya
+      changes:
+        - sql:
+            sql: CREATE TYPE status_enum AS ENUM ('FRIEND', 'SUBSCRIBER')
+        - sql:
+            sql: CREATE CAST (CHARACTER VARYING as status_enum) WITH INOUT AS IMPLICIT
+        - createTable:
+            tableName: post
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: text
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: image
+                  type: bytea
+              - column:
+                  name: author
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: post_creation_time
+                  type: timestamp
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: customer
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: username
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: interaction
+            columns:
+              - column:
+                  name: request_id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: sender
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: author
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: status_enum
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: correspondence
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: chat_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sender
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: recipient
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: message
+                  type: varchar
+                  constraints:
+                    nullable: false

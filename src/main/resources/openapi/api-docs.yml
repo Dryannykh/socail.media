@@ -1,0 +1,510 @@
+openapi: 3.0.0
+info:
+  title: Social media API - OpenAPI 1.0
+  version: 1.0.0
+servers:
+  - url: http://localhost:9090/
+tags:
+  - name: Auth
+    description: Authentication API
+  - name: Post
+    description: Post API
+  - name: Interaction
+    description: Interaction API
+  - name: Feeds
+    description: API to get a subscription feed
+paths:
+  /login:
+    post:
+      operationId: authenticateUser
+      summary: Authenticate user
+      tags:
+        - Auth
+      requestBody:
+        description: Login request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: User successfully authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtResponse'
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /register:
+    post:
+      operationId: registerUser
+      summary: Register user
+      tags:
+        - Auth
+      requestBody:
+        description: Register request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      responses:
+        '200':
+          description: User was registered
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /post:
+    post:
+      operationId: createPost
+      summary: Create post
+      tags:
+        - Post
+      parameters:
+        - in: header
+          name: authorization
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Post create request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreateRequest'
+        required: true
+      responses:
+        '204':
+          description: Post was created
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+  /post/{id}:
+    get:
+      operationId: getPostById
+      summary: Get post by id
+      tags:
+        - Post
+      parameters:
+        - in: header
+          name: authorization
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Got post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostDto'
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      operationId: changePostById
+      summary: Change post by id
+      tags:
+        - Post
+      parameters:
+        - in: header
+          name: authorization
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Post change request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostDto'
+      responses:
+        '201':
+          description: Post was changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostDto'
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      operationId: deletePostById
+      summary: Delete post by id
+      tags:
+        - Post
+      parameters:
+        - in: header
+          name: authorization
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Post was deleted
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /subscribe:
+    post:
+      operationId: subscribeToAuthor
+      summary: Send request to subscribe to the author
+      tags:
+        - Interaction
+      parameters:
+        - in: header
+          name: authorization
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Author name
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Author'
+        required: true
+      responses:
+        '200':
+          description: Subscription request sent
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /unsubscribe:
+    post:
+      operationId: unsubscribeFromAuthor
+      summary: Send request to unsubscribe from the author
+      tags:
+        - Interaction
+      parameters:
+        - in: header
+          name: authorization
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Author name
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Author'
+        required: true
+      responses:
+        '200':
+          description: You are unsubscribed from the author
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /accept/{requestId}:
+    get:
+      operationId: acceptFriendRequest
+      summary: Accept friend request
+      tags:
+        - Interaction
+      parameters:
+        - in: header
+          name: authorization
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: requestId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Subscription request accepted
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /reject/{requestId}:
+    get:
+      operationId: declineFriendRequest
+      summary: Decline friend request
+      tags:
+        - Interaction
+      parameters:
+        - in: header
+          name: authorization
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: requestId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Subscription request declined
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /get-correspondence/{chatId}:
+    get:
+      operationId: getCorrespondence
+      summary: Get correspondence
+      tags:
+        - Interaction
+      parameters:
+        - in: header
+          name: authorization
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: chatId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Correspondence has been received
+          content:
+            application/json:
+              schema:
+                type: string
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /get-my-posts:
+    get:
+      operationId: getUserPosts
+      summary: Get user Post
+      tags:
+        - Feed
+      parameters:
+        - in: header
+          name: authorization
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: pageable
+          required: false
+          schema:
+            $ref: '#/components/schemas/Pageable'
+      responses:
+        '200':
+          description: Got user post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostDtoList'
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /get-authors-posts:
+    get:
+      operationId: getAuthorsPosts
+      summary: Get the posts of the authors that the user is following
+      tags:
+        - Feed
+      parameters:
+        - in: header
+          name: authorization
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: pageable
+          required: false
+          schema:
+            $ref: '#/components/schemas/Pageable'
+      responses:
+        '200':
+          description: Got authors post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostDtoList'
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+          nullable: false
+        password:
+          type: string
+          nullable: false
+
+    JwtResponse:
+      type: object
+      properties:
+        token:
+          type: string
+
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          nullable: false
+        email:
+          type: string
+          nullable: false
+        password:
+          type: string
+          nullable: false
+
+    PostCreateRequest:
+      type: object
+      required:
+        - text
+        - title
+      properties:
+        text:
+          type: string
+          nullable: false
+        title:
+          type: string
+          nullable: false
+        image:
+          type: string
+          format: bytea
+
+    PostDto:
+      type: object
+      properties:
+        text:
+          type: string
+        title:
+          type: string
+        image:
+          type: string
+          format: byte
+        author:
+          type: string
+        postCreationTime:
+          type: string
+          format: timestamp
+
+    Author:
+      type: object
+      properties:
+        author:
+          type: string
+
+    PostDtoList:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostDto'
+        totalElements:
+          type: number
+        totalPages:
+          type: number
+        last:
+          type: boolean
+        numberOfElements:
+          type: number
+        first:
+          type: boolean
+        empty:
+          type: boolean
+
+    Pageable:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
